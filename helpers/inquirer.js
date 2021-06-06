@@ -2,24 +2,20 @@ const inquirer = require('inquirer');
 
 require('colors');
 
-const showMenu = async() => {
+const showAppMenu = async(appTitle = '', choices = []) => {
     const question = [
         {
             type: 'list',
             name: 'option',
             message: 'What would you like to do?',
-            choices: [
-                { value: 1, name: `${'1'.green}.- Search a place` },
-                { value: 2, name: `${'2'.green}.- History` },
-                { value: 0, name: `${'0'.green}.- Quit\n` },        
-            ],
+            choices
         }        
     ];
     
     console.clear();
 
     console.log('============================='.green);
-    console.log('   Places And Weather App'.white);
+    console.log(`   ${appTitle}`.white);
     console.log('============================\n'.green);
 
     const { option } = await inquirer.prompt(question);
@@ -42,6 +38,35 @@ const pause = async() => {
 
     return;
 }
+
+const listPlaces = async(places = []) => {
+    const choices = places.map((place, i) => {
+        const idx = `${i + 1}.-`.green;
+
+        return {
+            value: place.id,
+            name: `${ idx } ${ place.name }`,
+        }
+    });
+
+    choices.unshift({
+        value: '0',
+        name: '0.-'.green + ' Cancel',
+    });
+
+    const question = [
+        {
+            type: 'list',
+            name: 'id',
+            message: 'Select a place',
+            choices,
+        }
+    ]
+
+    const { id } = await inquirer.prompt(question);
+
+    return id;
+} 
 
 const readInput = async(message) => {
     const question = [
@@ -77,73 +102,11 @@ const confirm = async(message) => {
     return ok;
 }
 
-const listTasksToDelete = async( taskArray = []) => {
-    let i = 0;
-
-    const choices = taskArray.map(task => {
-        i = i + 1;
-
-        const idx = `${i.toString().green }${'.-'.green} `;
-
-        return {
-            value: task.id,
-            name: `${idx} ${task.description}`,            
-        }
-    });
-
-    choices.unshift({
-        value: '0',
-        name: `${'0.-'.green} Cancel`,
-    });
-
-    const questionOptions = [
-        {
-            type: 'list',
-            name: 'id',
-            message: 'Select task to delete',
-            choices
-        }
-    ];
-
-    const { id } = await inquirer.prompt(questionOptions);
-
-    return id;
-}
-
-const listTasksToComplete = async( taskArray = []) => {
-    let i = 0;
-
-    const choices = taskArray.map(task => {
-        i++;
-
-        const idx = `${i.toString().green }${'.-'.green} `;
-
-        return {
-            value: task.id,
-            name: `${idx} ${task.description}`,
-            checked: task.completedOn,            
-        }
-    });
-
-    const question = [
-        {
-            type: 'checkbox',
-            name: 'ids',
-            message: 'Select task(s)',
-            choices
-        }
-    ];
-
-    const { ids } = await inquirer.prompt(question);
-
-    return ids;
-}
 
 module.exports = {
-    showMenu,
+    showAppMenu,
     pause,
     readInput,
     confirm,
-    listTasksToDelete,
-    listTasksToComplete
+    listPlaces,
 }
